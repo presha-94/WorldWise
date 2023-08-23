@@ -41,15 +41,18 @@ function Form() {
             `${BASE_URL}?latitude=${lat}&longitude=${lng}`
           );
           const data = await res.json();
-
+          console.log(data);
           if (!data.countryCode)
             throw new Error(
               "You need to click on city inorder to continue the form🤓"
             );
 
+          console.log("ccode", data.countryCode);
+
           setCityName(data.city || data.locality || "");
           setCountry(data.countryName);
           setEmoji(convertToEmoji(data.countryCode));
+          setgeoErrorMessage("");
         } catch (err) {
           setgeoErrorMessage(err.message);
         } finally {
@@ -60,9 +63,6 @@ function Form() {
     },
     [lat, lng]
   );
-  if (isLoadingGeoCoding) return <Spinner />;
-  if (!lat && !lng) return <Message message="click on the map " />;
-  if (geoErrorMessage) return <Message message={geoErrorMessage} />;
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -79,6 +79,12 @@ function Form() {
     await CreateCity(newCity);
     navigate("/app/cities");
   }
+  if (isLoadingGeoCoding) return <Spinner />;
+
+  if (!lat && !lng) return <Message message="click on the map " />;
+
+  console.log(geoErrorMessage);
+  if (geoErrorMessage) return <Message message={geoErrorMessage} />;
 
   return (
     <form
